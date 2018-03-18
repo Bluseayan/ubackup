@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ubackup home</title>
+    <link href="./lib/_bootstrap@3.3.7@bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./lib/DataTables-1.10.15/media/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="./lib/vakata-jstree/dist/themes/default/style.min.css" rel="stylesheet">
+    <link href="./lib/jquery-ui-1.12.1/jquery-ui.min.css" rel="stylesheet">
+    <link href="./stylesheets/home.css" rel="stylesheet">
+    <script src="./lib/_jquery@3.2.1@jquery/dist/jquery.min.js"></script>
+    <script src="./lib/_bootstrap@3.3.7@bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="./lib/DataTables-1.10.15/media/js/jquery.dataTables.min.js"></script>
+    <script src="./lib/layer-v3.1.1/layer/layer.js"></script>
+    <script src="./lib/vakata-jstree/dist/jstree.min.js"></script>
+    <script src="./lib/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+    <script src="./javascripts/code.js"></script>
+    <script src="./javascripts/rootReady.js"></script>
+    <script src="./javascripts/zhen.js"></script>
+</head>
+
+<body>
+
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid" style="background-color: #0f0f0f">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#" style="color:#F8F8F8">联通备份系统</a>
+            <!--img alt="Brand" src="./images/u2.png"-->
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" style="color:#F8F8F8">
+            <ul class="nav navbar-nav">
+                <li id="progress"><a href="#" style="color:#F8F8F8">进度监控 <span class="sr-only">(current)</span></a></li>
+                <li id="setting"><a href="#" style="color:#F8F8F8">系统配置</a></li>
+                <li id="strategy"><a href="#" style="color:#F8F8F8">策略设置</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#" id="currentUser" style="color:#F8F8F8">当前用户</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="color:#F8F8F8">注销 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" id="logout">注销</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="./updatePassword.html">修改密码</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+<div style="height: 40px;">
+    <select id="userSelect" style="height: 40px;width: 105px;float: left">
+        <option id="userSelected" selected>----</option>
+    </select>
+
+    <ol class="breadcrumb" style="background-color:#eee;margin-left: 95px">
+        <li id="uNav" style="color:#0f0f0f;font-size:16px;font-weight: bold">用户</li>
+        <li id="sNav" style="color:#0f0f0f;font-size:16px;font-weight: bold"></li>
+        <li id="dNav" style="color:#0f0f0f;font-size:16px;font-weight: bold"></li>
+        <li id="fNav" style="color:#0f0f0f;font-size:16px;font-weight: bold"></li>
+        <li id="pNav" style="color:#0f0f0f;font-size:16px;font-weight: bold"></li>
+    </ol>
+</div>
+
+<div class="container">
+    <div class="alert alert-info" role="alert" style="margin-bottom:10px;" id="notice">
+        <p id="noticeContent" style="">动态消息栏：这里滚动重要的消息</p>
+    </div>
+</div>
+
+<div id="progressDiv" class="container">
+    <div style="height: 40.5px">
+        <button type="button" class="btn btn-primary" id="view" data-toggle="modal" data-target="#viewModal">查看脚本</button>
+    </div>
+
+    <div style="float:left; height: 400px;width: 220px;margin-top: 70px;overflow: scroll;border:1px solid #0f0f0f">
+        <ul id="jstree"></ul>
+    </div>
+
+    <div  style="margin-left: 240px;">
+        <div class="table-responsive" >
+            <table id="progressTable" class="display" >
+                <thead>
+                <tr>
+                    <th>历史ID</th>
+                    <th>系统名</th>
+                    <th>设备名</th>
+                    <th>文件名</th>
+                    <th>备份时间</th>
+                    <th>状态</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<div id="settingDiv" hidden="hidden">
+    <div class="container">
+        <div id="setGroup" style="height: 40.5px">
+            <button type="button" class="btn btn-default" style="border: none;background-color: #eee;height: 40.5px;" id="back" disabled> <span class="glyphicon glyphicon-arrow-left" aria-hidden="true" style="font-size: 25px;"></span></button>
+            <button type="button" class="btn btn-default" style="border: none;background-color: #eee;height: 40.5px;" id="enter"> <span class="glyphicon glyphicon-arrow-right" aria-hidden="true" style="font-size: 25px;"></span></button>
+        </div>
+
+        <div id="systems">
+            <div class="table-responsive">
+                <table id="systemTable" class="display" style="width:100%">
+                    <thead>
+                    <tr>
+                        <th>系统ID</th>
+                        <th>系统名</th>
+                        <th>系统描诉</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="devices" hidden="hidden">
+            <div class="table-responsive">
+                <table id="deviceTable" class="display">
+                    <thead>
+                    <tr>
+                        <th>设备ID</th>
+                        <th>设备名</th>
+                        <th>设备类型</th>
+                        <th>设备ip</th>
+                        <th>设备用户名</th>
+                        <th>设备登录密码</th>
+                        <th>设备ssh端口</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="files" hidden="hidden">
+            <div class="table-responsive">
+                <table id="fileTable" class="display">
+                    <thead>
+                    <tr>
+                        <th>文件ID</th>
+                        <th>文件名</th>
+                        <th>文件类型</th>
+                        <th>文件远程路径</th>
+                        <th>查看配置命令</th>
+                        <th>配置信息关键字</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="strategyDiv" hidden="hidden">
+    <div class="container">
+        <div style="height: 40.5px">
+
+        </div>
+
+        <div class="table-responsive">
+            <table id="strategyTable" class="display" style="width:100%">
+                <thead>
+                <tr>
+                    <th>系统ID</th>
+                    <th>系统名</th>
+                    <th>系统描诉</th>
+                    <th>备份频率</th>
+                    <th>截止时间</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="viewModal" tabindex="-1" role="dialog" aria-labelledby="viewModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="viewModalLabel">查看文件脚本结果</h4>
+            </div>
+            <div class="modal-body">
+                <p id="progressContent" ></p>
+                <p id="scriptContent" ></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="closeView">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>

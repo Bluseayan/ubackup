@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>index</title>
+    <link href="./lib/_bootstrap@3.3.7@bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./stylesheets/signin.css" rel="stylesheet">
+    <link href="./lib/unlock/assets/less/unlock.css" rel="stylesheet">
+    <script src="./lib/_jquery@3.2.1@jquery/dist/jquery.min.js"></script>
+    <script src="./lib/_bootstrap@3.3.7@bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="./lib/layer-v3.1.1/layer/layer.js"></script>
+    <script src="./lib/unlock/assets/js/unlock.js"></script>
+    <script src="./javascripts/code.js"></script>
+    <script src="./javascripts/mysmd.js"></script>
+    <script src="./javascripts/zhen.js"></script>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="form-sign">
+        <div>
+            <h1 class="form-sign-heading" style="text-align: center">联通备份系统</h1>
+        </div>
+        <div>
+            <a href="#signin" class="active" id="go_signin" style="font-size: larger;text-align:center;margin-left: 110px">登录</a>
+            <a href="#signup" class="active" id="go_signup" style="font-size: larger;text-align:center">注册</a>
+        </div>
+    </div>
+
+    <div id="signin">
+        <form class="form-sign">
+            <div class="form-group">
+                <input type="text" class="form-control" id="username" placeholder="请输入用户名" required autofocus>
+                <input type="password" class="form-control" id="password" placeholder="请输入密码" required>
+            </div>
+            <div id="signinUnlock" class="form-group" style="width: 300px;height: 44px"></div>
+            <button type="button" class="btn btn-lg btn-primary btn-block" id="login">登录</button>
+        </form>
+
+    </div>
+
+    <div id="signup" hidden="hidden">
+        <form class="form-sign">
+            <div class="form-group">
+                <input type="text" class="form-control" id="username_r" placeholder="请输入用户名" required autofocus>
+                <input type="password" class="form-control" id="password_r" placeholder="请输入密码" required>
+                <input type="password" class="form-control" id="repeatPassword_r" placeholder="重复一遍密码" required>
+            </div>
+            <div id="signupUnlock" class="form-group" style="width: 300px;height: 44px"></div>
+            <button type="button" class="btn btn-lg btn-primary btn-block" id="register">注册</button>
+        </form>
+    </div>
+
+</div>
+
+<script>
+
+    $(function () {
+        $('#go_signin').click(function () {
+            $('#signup').hide();
+            $('#signin').show();
+        });
+
+        $('#go_signup').click(function () {
+            $('#signin').hide();
+            $('#signup').show();
+        });
+        //
+        var inUnlockFlag = false;
+        $('#signinUnlock').slideToUnlock({
+            bgColor:'#fff',
+            handleColor:'#78D02E',
+            text:'滑动解锁',
+            succText: '解锁成功',
+            successFunc: function() {
+                inUnlockFlag = true;
+            }
+        });
+        //
+        var upUnlockFlag = false;
+        $('#signupUnlock').slideToUnlock({
+            bgColor:'#fff',
+            handleColor:'#78D02E',
+            text:'滑动解锁',
+            succText: '解锁成功',
+            successFunc: function() {
+                upUnlockFlag = true;
+            }
+        });
+        //
+        $('#login').click(function () {
+            var username = $('#username').val().trim();
+            var password = mysmd($('#password').val().trim());
+            if(inUnlockFlag === true){
+                $.post('/login',{username:username,password:password},function (data) {
+                    if (data.code === code.login.ok){
+                        sessionStorage.setItem("username",username);
+                        sessionStorage.setItem("userID",data.data.userID);
+                        sessionStorage.setItem("token",data.data.token);
+                        sessionStorage.setItem("userType",data.data.userType);
+                        //
+                        sessionStorage.setItem("login_userID",data.data.userID);
+
+                        if(data.data.userType === 0){
+                            window.location.href = '/home.html';
+                        }
+                        else {
+                            window.location.href = '/rootHome.html';
+                        }
+                    }
+                    else{
+                        layer.msg(data.code);
+                    }
+                })
+            }
+            else {
+                layer.msg('解锁未通过！');
+            }
+        });
+        //
+        $('#register').click(function () {
+            var username = $('#username_r').val().trim();
+            var password = $('#password_r').val().trim();
+            var repeat = $('#repeatPassword_r').val().trim();
+            var flag = true;
+            if(checkChar(username)===false || checkChar(password)===false){
+                flag = false;
+                layer.msg('用户名和密码只能是英文、数字、汉字。');
+            }
+            else if(password.length < 6){
+                flag = false;
+                layer.msg('密码长度过短。');
+            }
+            else if(password !== repeat){
+                flag = false;
+                layer.msg('两次密码不一致');
+            }
+            if(flag === true){
+                password = mysmd(password);
+                if(upUnlockFlag === true){
+                    $.post('/register',{username:username,password:password},function (data) {
+                        layer.msg(data.code);
+                    })
+                }
+                else {
+                    layer.msg('解锁未通过！');
+                }
+            }
+        });
+    })
+
+</script>
+
+</body>
+
+</html>

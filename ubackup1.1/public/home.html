@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ubackup home</title>
+    <link href="./lib/_bootstrap@3.3.7@bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./lib/DataTables-1.10.15/media/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="./lib/vakata-jstree/dist/themes/default/style.min.css" rel="stylesheet">
+    <link href="./lib/jquery-ui-1.12.1/jquery-ui.min.css" rel="stylesheet">
+    <link href="./stylesheets/home.css" rel="stylesheet">
+    <script src="./lib/_jquery@3.2.1@jquery/dist/jquery.min.js"></script>
+    <script src="./lib/_bootstrap@3.3.7@bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="./lib/DataTables-1.10.15/media/js/jquery.dataTables.min.js"></script>
+    <script src="./lib/layer-v3.1.1/layer/layer.js"></script>
+    <script src="./lib/vakata-jstree/dist/jstree.min.js"></script>
+    <script src="./lib/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+    <script src="./javascripts/code.js"></script>
+    <script src="./javascripts/ready.js"></script>
+    <script src="./javascripts/zhen.js"></script>
+</head>
+
+<body>
+
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid" style="background-color: #0f0f0f">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#" style="color:#F8F8F8">联通备份系统</a>
+            <!--img alt="Brand" src="./images/u2.png"-->
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" style="color:#F8F8F8">
+            <ul class="nav navbar-nav">
+                <li id="progress"><a href="#" style="color:#F8F8F8">进度监控 <span class="sr-only">(current)</span></a></li>
+                <li id="setting"><a href="#" style="color:#F8F8F8">系统配置</a></li>
+                <li id="strategy"><a href="#" style="color:#F8F8F8">策略设置</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#" id="currentUser" style="color:#F8F8F8">当前用户</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="color:#F8F8F8">注销 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" id="logout">注销</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="./updatePassword.html">修改密码</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+<div style="height: 40px;">
+    <ol class="breadcrumb" style="background-color:#eee;">
+        <li id="uNav" style="color:#0f0f0f;font-size:16px;font-weight: bold">用户</li>
+        <li id="sNav" style="color:#0f0f0f;font-size:16px;font-weight: bold"></li>
+        <li id="dNav" style="color:#0f0f0f;font-size:16px;font-weight: bold"></li>
+        <li id="fNav" style="color:#0f0f0f;font-size:16px;font-weight: bold"></li>
+        <li id="pNav" style="color:#0f0f0f;font-size:16px;font-weight: bold"></li>
+    </ol>
+</div>
+
+<div class="container">
+    <div class="alert alert-info" role="alert" style="margin-bottom:10px;" id="notice">
+        <p id="noticeContent" style="">动态消息栏：这里滚动重要的消息</p>
+    </div>
+</div>
+
+<div id="progressDiv" class="container">
+    <div style="height: 40.5px">
+        <button type="button" class="btn btn-primary" id="download" disabled>创建下载</button>
+        <button type="button" class="btn btn-primary" id="view" data-toggle="modal" data-target="#viewModal">查看脚本</button>
+        <button type="button" class="btn btn-primary" id="again" data-toggle="modal" data-target="#againModal" disabled>立即重试</button>
+        <button type="button" class="btn btn-info" id="ignore" disabled>忽略失败</button>
+        <a id="downloadUrl" href="#" hidden="hidden">点击下载文件</a>
+    </div>
+
+    <div style="float:left; height: 400px;width: 220px;margin-top: 70px;overflow: scroll;border:1px solid #0f0f0f">
+        <ul id="jstree"></ul>
+    </div>
+
+    <div  style="margin-left: 240px;">
+        <div class="table-responsive" >
+            <table id="progressTable" class="display" >
+                <thead>
+                <tr>
+                    <th>历史ID</th>
+                    <th>系统名</th>
+                    <th>设备名</th>
+                    <th>文件名</th>
+                    <th>备份时间</th>
+                    <th>状态</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<div id="settingDiv" hidden="hidden">
+    <div class="container">
+        <div id="setGroup" style="height: 40.5px">
+            <button type="button" class="btn btn-default" style="border: none;background-color: #eee;height: 40.5px;" id="back" disabled> <span class="glyphicon glyphicon-arrow-left" aria-hidden="true" style="font-size: 25px;"></span></button>
+            <button type="button" class="btn btn-default" style="border: none;background-color: #eee;height: 40.5px;" id="enter"> <span class="glyphicon glyphicon-arrow-right" aria-hidden="true" style="font-size: 25px;"></span></button>
+            <button type="button" class="btn btn-primary" id="add" data-toggle="modal" data-target="#addModal">添加</button>
+            <button type="button" class="btn btn-primary" id="update" data-toggle="modal" data-target="#updateModal">修改</button>
+            <button type="button" class="btn btn-danger" id="delete">删除</button>
+            <button type="button" class="btn btn-info" style="display: none" id="test" data-toggle="modal" data-target="#testModal">测试</button>
+        </div>
+
+        <div id="systems">
+            <div class="table-responsive">
+                <table id="systemTable" class="display" style="width:100%">
+                    <thead>
+                    <tr>
+                        <th>系统ID</th>
+                        <th>系统名</th>
+                        <th>系统描诉</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="devices" hidden="hidden">
+            <div class="table-responsive">
+                <table id="deviceTable" class="display">
+                    <thead>
+                    <tr>
+                        <th>设备ID</th>
+                        <th>设备名</th>
+                        <th>设备类型</th>
+                        <th>设备ip</th>
+                        <th>设备用户名</th>
+                        <th>设备登录密码</th>
+                        <th>设备ssh端口</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="files" hidden="hidden">
+            <div class="table-responsive">
+                <table id="fileTable" class="display">
+                    <thead>
+                    <tr>
+                        <th>文件ID</th>
+                        <th>文件名</th>
+                        <th>文件类型</th>
+                        <th>文件远程路径</th>
+                        <th>查看配置命令</th>
+                        <th>配置信息关键字</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="strategyDiv" hidden="hidden">
+    <div class="container">
+        <div style="height: 40.5px">
+            <button type="button" class="btn btn-primary" id="edit" data-toggle="modal" data-target="#editModal">编辑策略</button>
+        </div>
+
+        <div class="table-responsive">
+            <table id="strategyTable" class="display" style="width:100%">
+                <thead>
+                <tr>
+                    <th>系统ID</th>
+                    <th>系统名</th>
+                    <th>系统描诉</th>
+                    <th>备份频率</th>
+                    <th>截止时间</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="editModalLabel">编辑策略</h4>
+            </div>
+            <div class="modal-body">
+                <input type="radio" name="days" checked="checked" value='30' id="frequency_30">30天备份一次
+                <input type="radio" name="days" value="60" id="frequency_60">60天备份一次
+                <input type="radio" name="days" value="custom" id="frequency_custom">自定义
+                <input type="text" hidden="hidden" class="form-control" id="frequency" placeholder="输入一个整数，代表你希望多少天备份一次" disabled required autofocus>
+                <input type="text" hidden="hidden" class="form-control" id="endtime" placeholder="截止日期" required autofocus>
+            </div>
+            <div class="modal-footer">
+                <!--button type="button" class="btn btn-default" id="resetUpdateStrategy">重置</button-->
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="saveUpdateStrategy">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="viewModal" tabindex="-1" role="dialog" aria-labelledby="viewModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="viewModalLabel">查看文件脚本结果</h4>
+            </div>
+            <div class="modal-body">
+                <p id="progressContent" ></p>
+                <p id="scriptContent" ></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="closeView">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="testModal" tabindex="-1" role="dialog" aria-labelledby="testLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="testModalLabel">查看文件测试结果</h4>
+            </div>
+            <div class="modal-body">
+                <p id="testProgress"></p>
+                <p id="testScript" ></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="closeFileTest">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="againModal" tabindex="-1" role="dialog" aria-labelledby="againModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="againModalLabel">查看文件立即重试结果</h4>
+            </div>
+            <div class="modal-body">
+                <p id="againProgress"></p>
+                <p id="againScript" ></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="closeAgain">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" id="addSystemContent">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="addSystemModalLabel">添加系统</h4>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="form-control" id="addSystemName" placeholder="请输入系统名" required autofocus>
+                <input type="text" class="form-control" id="addSystemDescribe" placeholder="请输入系统描诉" required autofocus>
+            </div>
+            <div class="modal-footer">
+                <!--button type="button" class="btn btn-default" id="resetAddSystem">重置</button-->
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="saveAddSystem">保存</button>
+            </div>
+        </div>
+
+        <div class="modal-content" hidden="hidden" id="addDeviceContent">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="addDeviceModalLabel">添加设备</h4>
+            </div>
+            <div class="modal-body">
+                <input type="radio" name="addDeviceType" checked="checked" value='0'>linux主机
+                <input type="radio" name="addDeviceType" value="1">路由器或交换机
+                <input type="text" class="form-control" id="addDeviceName" placeholder="请输入设备名" required autofocus>
+                <input type="text" class="form-control" id="addIp" placeholder="请输入设备ip(务必格式正确，例如:127.0.0.1)" required autofocus>
+                <input type="text" class="form-control" id="addDeviceUsername" placeholder="请输入设备的登录用户名" required autofocus>
+                <input type="password" class="form-control" id="addDevicePassword" placeholder="请输入设备的登录密码" required autofocus>
+                <input type="text" class="form-control" id="addDevicePort" placeholder="请输入设备的ssh端口号(默认22)" required autofocus>
+            </div>
+            <div class="modal-footer">
+                <!--button type="button" class="btn btn-default" id="resetAddDevice">重置</button-->
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="saveAddDevice">保存</button>
+            </div>
+        </div>
+
+        <div class="modal-content" hidden="hidden" id="addFileContent">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="addFileModalLabel">添加文件</h4>
+            </div>
+            <div class="modal-body" id="addHost">
+                <input type="text" class="form-control" id="addHostFilename" placeholder="请输入文件名" required autofocus>
+                <input type="text" class="form-control" id="addRemotePath" placeholder="请输入文件运程路径(以/'开头,结尾不加'/',例如:/home/user/my)" required autofocus>
+            </div>
+            <div class="modal-body" id="addRouter">
+                <input type="text" class="form-control" id="addRouterFilename" placeholder="请输入文件名" required autofocus>
+                <input type="text" class="form-control" id="addRouteCommand" placeholder="请输入查看配置命令(例如:display current)" required autofocus>
+                <input type="text" class="form-control" id="addIdentifyKeywords" placeholder="预期配置信息一定包含某个关键字符,你可以输入一个作为验证" required autofocus>
+            </div>
+            <div class="modal-footer">
+                <!--button type="button" class="btn btn-default" id="resetAddFile">重置</button-->
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="saveAddFile">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel">
+    <div class="modal-dialog" role="document">
+
+        <div class="modal-content" id="updateSystemContent">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="updateSystemModalLabel">修改系统</h4>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="form-control" id="updateSystemName" placeholder="系统名不支持修改" disabled required autofocus>
+                <input type="text" class="form-control" id="updateSystemDescribe" placeholder="请输入系统描诉" required autofocus>
+            </div>
+            <div class="modal-footer">
+                <!--button type="button" class="btn btn-default" id="resetUpdateSystem">重置</button-->
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="saveUpdateSystem">保存</button>
+            </div>
+        </div>
+
+
+        <div class="modal-content" hidden="hidden" id="updateDeviceContent">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="updateDeviceModalLabel">修改设备</h4>
+            </div>
+            <div class="modal-body">
+                <input type="radio" name="updateDeviceType" disabled checked="checked" value='0'>linux主机
+                <input type="radio" name="updateDeviceType" disabled value="1">路由器或交换机
+                <input type="text" class="form-control" id="updateDeviceName" placeholder="设备名不支持修改" disabled required autofocus>
+                <input type="text" class="form-control" id="updateIp" placeholder="请输入设备ip(务必格式正确，例如:127.0.0.1)" required autofocus>
+                <input type="text" class="form-control" id="updateDeviceUsername" placeholder="请输入设备的登录用户名" required autofocus>
+                <input type="password" class="form-control" id="updateDevicePassword" placeholder="请输入设备的登录密码" required autofocus>
+                <input type="text" class="form-control" id="updateDevicePort" placeholder="请输入设备的ssh端口号(默认22)" required autofocus>
+            </div>
+            <div class="modal-footer">
+                <!--button type="button" class="btn btn-default" id="resetUpdateDevice">重置</button-->
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="saveUpdateDevice">保存</button>
+            </div>
+        </div>
+
+        <div class="modal-content" hidden="hidden" id="updateFileContent">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="updateFileModalLabel">修改文件</h4>
+            </div>
+            <div class="modal-body" id="updateHost">
+                <input type="text" class="form-control" id="updateHostFilename" disabled placeholder="文件名不支持修改" required autofocus>
+                <input type="text" class="form-control" id="updateRemotePath" placeholder="请输入文件运程路径(以/'开头,结尾不加'/',例如:/home/user/my)" required autofocus>
+            </div>
+            <div class="modal-body" id="updateRouter">
+                <input type="text" class="form-control" id="updateRouterFilename" disabled placeholder="文件名不支持修改" required autofocus>
+                <input type="text" class="form-control" id="updateRouteCommand" placeholder="请输入查看配置命令(例如:display current)" required autofocus>
+                <input type="text" class="form-control" id="updateIdentifyKeywords" placeholder="预期配置信息一定包含某个关键字符,你可以输入一个作为验证" required autofocus>
+            </div>
+            <div class="modal-footer">
+                <!--button type="button" class="btn btn-default" id="resetUpdateFile">重置</button-->
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="saveUpdateFile">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>
